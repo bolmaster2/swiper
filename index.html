@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title>swiper.js</title>
+
+		<style>
+      /* center the images inside the list item */
+			.swipes ul > li {
+			  text-align: center;
+
+			}
+		</style>
+	
+	</head>
+	
+	
+	
+	<body>
+		
+		<h1>swiper.js</h1>
+    <p>swiper.js handles the swiping for you. All you have to do is have a list (wrapped inside a div) in your markup like this:</p>
+<pre><code>
+&lt;div class="swipes"&gt;
+  &lt;ul class="inner" id="touch-container">
+		&lt;li&gt;&lt;img src="img/1.jpg" alt="" /&gt;&lt;/li&gt;
+		&lt;li&gt;&lt;img src="img/2.jpg" alt="" /&gt;&lt;/li&gt;
+		&lt;li&gt;&lt;img src="img/3.jpg" alt="" /&gt;&lt;/li&gt;
+	&lt;/ul&gt;
+&lt;/div&gt;
+</code></pre>
+
+	<p>This is an simple swiper example:</p>
+
+	<div class="swipes">
+    <ul class="inner" id="touch-container">
+			<li><img src="img/1.jpg" alt="" /></li>
+			<li><img src="img/2.jpg" alt="" /></li>
+			<li><img src="img/3.jpg" alt="" /></li>
+		</ul>
+	</div>
+		
+		
+    <!-- include the swiper javascript -->
+		<script src="swiper.js"></script>
+		<script>
+			// Init the swiper!
+			new Swiper(document.getElementById("touch-container"));
+		</script>
+	</body>
+</html>
