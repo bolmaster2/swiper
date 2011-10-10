@@ -1,0 +1,11 @@
+# swiper.js
+
+swiper.js handles the swiping for you. All you have to do is have a list (wrapped inside a div) in your markup like this:
+
+    &lt;div class="swipes"&gt;
+      &lt;ul class="inner" id="touch-container">
+    		&lt;li&gt;&lt;img src="img/1.jpg" alt="" /&gt;&lt;/li&gt;
+    		&lt;li&gt;&lt;img src="img/2.jpg" alt="" /&gt;&lt;/li&gt;
+    		&lt;li&gt;&lt;img src="img/3.jpg" alt="" /&gt;&lt;/li&gt;
+    	&lt;/ul&gt;
+    &lt;/div&gt;
