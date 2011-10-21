@@ -2,29 +2,29 @@
 // Make a list swipeable! 
 // param el the list element (ul)
 function Swiper(el) {
-	
+
   // private vars
-	var viewport = el,
-	  start_x = 0,
-  	start_y = 0,
-  	cur_pos = 0,
-  	touch_start_time,
-  	start_x_offset = 0,
-  	start_y_offset = 0,
-  	direction = null, 
-  	lock_x = false,
-  	dom_prefixes = "Webkit Moz O ms Khtml".split(" ");
-	
-  // options
-	var o = {
-	  "snap": true, // snap to element?
-	  "slide_strength": 5000, // how far should the element slide when you swipe?
-	  "transition_speed": 250, // the transition speed when swiped
-	  "animation_type": "linear" // type of swipe animation
-	};
+  var viewport = el,
+    start_x = 0,
+    start_y = 0,
+    cur_pos = 0,
+    touch_start_time,
+    start_x_offset = 0,
+    start_y_offset = 0,
+    direction = null, 
+    lock_x = false,
+    dom_prefixes = "Webkit Moz O ms Khtml".split(" ");
   
-	function init() {
-	  // set styles
+  // options
+  var o = {
+    "snap": true, // snap to element?
+    "slide_strength": 5000, // how far should the element slide when you swipe?
+    "transition_speed": 250, // the transition speed when swiped
+    "animation_type": "linear" // type of swipe animation
+  };
+  
+  function init() {
+    // set styles
     set_styles();
     
     // bind resize events
@@ -32,41 +32,41 @@ function Swiper(el) {
     window.onorientationchange = function() {set_styles();};
     
     // bind touch start event
-  	viewport.addEventListener("touchstart", touch_start, false);
-	}
-	
+    viewport.addEventListener("touchstart", touch_start, false);
+  }
+  
   // touch start
-	function touch_start(e) {
+  function touch_start(e) {
     
     // get the start values
-		start_x = cur_pos;
-		start_x_offset = event.targetTouches[0].pageX;
-		start_y_offset = event.targetTouches[0].pageY;
+    start_x = cur_pos;
+    start_x_offset = event.targetTouches[0].pageX;
+    start_y_offset = event.targetTouches[0].pageY;
     touch_start_time = new Date().getTime();
-	  
+    
     // reset the transition duration
-	  for (var k in dom_prefixes) {
-	    viewport.style[dom_prefixes[k] + "TransitionDuration"] = "0ms";
-	  }
-	  
+    for (var k in dom_prefixes) {
+      viewport.style[dom_prefixes[k] + "TransitionDuration"] = "0ms";
+    }
+    
     // bind the move and end events
-		viewport.addEventListener("touchmove", touch_move, false);
-		viewport.addEventListener("touchend", touch_end, false);
-	};
-	
+    viewport.addEventListener("touchmove", touch_move, false);
+    viewport.addEventListener("touchend", touch_end, false);
+  };
+  
   // cancel the touch - unbind the events
-	function cancel_touch() {
+  function cancel_touch() {
     viewport.removeEventListener('touchmove', touch_move);
     viewport.removeEventListener('touchend', touch_end);
-	}
+  }
   
   // touch move
-	function touch_move(e) {
-		
-		diff = e.targetTouches[0].pageX;
-		
+  function touch_move(e) {
+    
+    diff = e.targetTouches[0].pageX;
+    
     // cancel touch if more than 1 fingers
-		if (e.touches.length > 1) {
+    if (e.touches.length > 1) {
       cancel_touch();
     } else {
       // the x and y movement
@@ -83,8 +83,8 @@ function Swiper(el) {
         
         // move the viewport with css3 transform
         for (var k in dom_prefixes) {
-    	    viewport.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + cur_pos + 'px, 0, 0)';
-    	  }
+          viewport.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + cur_pos + 'px, 0, 0)';
+        }
 
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
         lock_x = true;
@@ -94,12 +94,12 @@ function Swiper(el) {
       }
     }
 
-	};
+  };
   
   // touch end
-	function touch_end(e) {
-	  lock_x = false;
-		viewport.removeEventListener("touchmove", touch_move, false);
+  function touch_end(e) {
+    lock_x = false;
+    viewport.removeEventListener("touchmove", touch_move, false);
 
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
@@ -116,12 +116,12 @@ function Swiper(el) {
     // do the transition!
     for (var k in dom_prefixes) {
       viewport.style[dom_prefixes[k] + "Transition"] = 'all '+o.transition_speed+'ms ' + o.animation_type;
-	    viewport.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + new_left + 'px, 0, 0)';
-	  }
+      viewport.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + new_left + 'px, 0, 0)';
+    }
     // save the new position
     cur_pos = new_left;
     
-	};
+  };
   
   // set some styling on the elements
   function set_styles() {
@@ -139,32 +139,32 @@ function Swiper(el) {
   }
 
   // Get the closest element to a "viewport"
-	function get_closest_element(parent, cur_pos) {
-	  
+  function get_closest_element(parent, cur_pos) {
+    
     // the vars
-		var children = parent.getElementsByTagName("li"),
-		  min = 9999999,
-		  current_pos = -parseInt(cur_pos),
-		  el = null;
-		
+    var children = parent.getElementsByTagName("li"),
+      min = 9999999,
+      current_pos = -parseInt(cur_pos),
+      el = null;
+    
     // loop through our childrens to find the closest one to our parent (aka "viewport")
-		for (var i = 0; i < children.length; i++) {
+    for (var i = 0; i < children.length; i++) {
       // get our "value"; that is the current children's offset minus our current position
-			var value = children[i].offsetLeft - current_pos;
-			
+      var value = children[i].offsetLeft - current_pos;
+      
       // flip the value from negative to positive to get the same results from elements from both left and right side 
-			if (value < 0)
-				value = -value;
+      if (value < 0)
+        value = -value;
       
       // lets find the lowest value (aka closest element)
-			if (value < min) {
-				min = value;
-				el = children[i];
-			}
-		}
+      if (value < min) {
+        min = value;
+        el = children[i];
+      }
+    }
     // return the element
-		return el;
-	};
+    return el;
+  };
 
   init();
 }
