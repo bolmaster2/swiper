@@ -1,6 +1,11 @@
-// Slider for touch devices
-// Make a list swipeable! 
-// param el the list element (ul)
+
+/**
+ * Slider for touch devices - makes a list swipeable
+ * @author Joel Larsson @joellarsson
+ * @url https://github.com/blmstr/swiper
+ * @param el the list element (ul)
+ *
+ **/
 function Swiper(el) {
 
   // private vars
@@ -28,8 +33,8 @@ function Swiper(el) {
     set_styles();
     
     // bind resize events
-    window.onresize = function() {set_styles();};
-    window.onorientationchange = function() {set_styles();};
+    window.addEventListener("resize", set_styles);
+    window.addEventListener("orientationchange", set_styles);
     
     // bind touch start event
     viewport.addEventListener("touchstart", touch_start, false);
