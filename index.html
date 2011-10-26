@@ -1,51 +1,88 @@
 <!DOCTYPE html>
 <html>
-	<head>
-		<meta charset="utf-8" />
-		<title>swiper.js</title>
+  <head>
+    <meta charset="utf-8" />
+    <title>swiper.js</title>
+    <link href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css'>
+    <style>
+    
+    /* center the images inside the list item */
+    .swipes ul > li {
+      text-align: center;
+    }
 
-		<style>
-      /* center the images inside the list item */
-			.swipes ul > li {
-			  text-align: center;
+    /* styling for the example */
+    body {
+      font: 18px/24px "georgia", "serif";
+      text-shadow: 1px 0 1px #fff;
+    }
+    
+    h1, h2 {
+      font-family: "Bangers";
+      font-weight: normal;
+    }
+    h2 {
+      font-size: 24px;
+    }
+    p {
+      margin-bottom: 24px;
+    }
+    ul {
+      list-style: none;
+    }
+    pre {
+      font: 14px/18px "consolas", "courier";
+      background-color: #eee;
+      padding: 10px;  
+      overflow: auto;
+    }
+    small {
+      color: #aaa;
+      font-size: 14px;
+    }
+    </style>
+  
+  </head>
 
-			}
-		</style>
-	
-	</head>
-	
-	
-	
-	<body>
-		
-		<h1>swiper.js</h1>
+  <body>
+    
+    <h1 id="logo">swiper.js</h1>
+    <p>A really lightweight <em>(only 1.7k)</em> library to make lists <i>swipeable</i> on touch devices (iphone, android).</p>
+    
+    <h2 id="how">How?</h2>
     <p>swiper.js handles the swiping for you. All you have to do is have a list (wrapped inside a div) in your markup like this:</p>
-<pre><code>
-&lt;div class="swipes"&gt;
-  &lt;ul class="inner" id="touch-container">
-		&lt;li&gt;&lt;img src="img/1.jpg" alt="" /&gt;&lt;/li&gt;
-		&lt;li&gt;&lt;img src="img/2.jpg" alt="" /&gt;&lt;/li&gt;
-		&lt;li&gt;&lt;img src="img/3.jpg" alt="" /&gt;&lt;/li&gt;
-	&lt;/ul&gt;
+<pre><code>&lt;div class="swipes"&gt;
+  &lt;ul id="my-list">
+    &lt;li&gt;&lt;img src="img/1.jpg" alt="" /&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;img src="img/2.jpg" alt="" /&gt;&lt;/li&gt;
+    &lt;li&gt;&lt;img src="img/3.jpg" alt="" /&gt;&lt;/li&gt;
+  &lt;/ul&gt;
 &lt;/div&gt;
 </code></pre>
 
-	<p>This is an simple swiper example:</p>
+    <p>... and then init the swiper: </p>
+<pre><code>new Swiper(document.getElementById("my-list"));</code></pre>
 
-	<div class="swipes">
-    <ul class="inner" id="touch-container">
-			<li><img src="img/1.jpg" alt="" /></li>
-			<li><img src="img/2.jpg" alt="" /></li>
-			<li><img src="img/3.jpg" alt="" /></li>
-		</ul>
-	</div>
-		
-		
+	  <h2 id="demo">Demo</h2>
+    <p>Just swipe the images! <br/> <small>(if you're not using a touch device you'll just see an ordinary list with the images.)</small></p>
+
+    <div class="swipes">
+      <ul id="my-list">
+        <li><img src="img/1.jpg" alt="" /></li>
+        <li><img src="img/2.jpg" alt="" /></li>
+        <li><img src="img/3.jpg" alt="" /></li>
+      </ul>
+    </div>
+    
+    
+    <h2 id="code">Code</h2>
+    <p><a href="https://github.com/blmstr/swiper">Get it from github here</a></p>
+
     <!-- include the swiper javascript -->
-		<script src="swiper.js"></script>
-		<script>
-			// Init the swiper!
-			new Swiper(document.getElementById("touch-container"));
-		</script>
-	</body>
+    <script src="swiper.js"></script>
+    <script>
+    // Init the swiper!
+    new Swiper(document.getElementById("my-list"));
+    </script>
+  </body>
 </html>

@@ -29,6 +29,10 @@ function Swiper(el) {
   };
   
   function init() {
+    if (!is_touch_device()) {
+      // do nothing if this isn't a touch device
+      return false;
+    }
     // set styles
     set_styles();
     
@@ -175,13 +179,8 @@ function Swiper(el) {
 }
 
 // external helpers
-// set multiple style rules
+// set style rules
 function style_me(el, styles) {
-  // if multiple elements, loop through all the elements
-  // if (toString.call(el) === "[object HTMLCollection]") {
-  //   for (var k in el) {style_me(el[k], styles);}
-  //   return;
-  // }
   // loop the style rules and set them
   for (var k in styles) {
     if (el.style) {
@@ -191,4 +190,14 @@ function style_me(el, styles) {
       
   }
   return;
+}
+
+// Check to see if we can create touch events to see if it's a "touch device"
+function is_touch_device() {
+	try {
+		document.createEvent("TouchEvent");
+    return true;
+  } catch (e) {
+		return false;
+  }
 }
