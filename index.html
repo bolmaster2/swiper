@@ -6,6 +6,9 @@
     <link href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css'>
     <style>
     
+    .swipes {
+      width: 700px;
+    }
     /* center the images inside the list item */
     .swipes ul > li {
       text-align: center;
@@ -73,7 +76,7 @@
         <li><img src="img/3.jpg" alt="" /></li>
       </ul>
     </div>
-    
+    <a href="#" id="prev">Previous</a><a href="#" id="next">Next</a>
     
     <h2 id="code">Code</h2>
     <p><a href="https://github.com/blmstr/swiper">Get it from github here</a></p>
@@ -81,8 +84,24 @@
     <!-- include the swiper javascript -->
     <script src="swiper.js"></script>
     <script>
+
+    // The list element
+    var list_el = document.getElementById("my-list");
+
     // Init the swiper!
-    new Swiper(document.getElementById("my-list"));
+    var swiper = new Swiper(list_el);
+    
+
+    // Set the next and previous click events
+    document.getElementById("next").onclick = function(e) {
+      e.preventDefault();
+      swiper.goto_next();
+    }
+    document.getElementById("prev").onclick = function(e) {
+      e.preventDefault();
+      swiper.goto_prev();
+    }
+    
     </script>
   </body>
 </html>

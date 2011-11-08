@@ -21,7 +21,7 @@ function Swiper(el, options_param) {
       direction = null, 
       lock_x = false,
       dom_prefixes = "Webkit Moz O ms Khtml".split(" ");
-    
+  
   function event_props(e) {
     return {
       'page_x': e.pageX || e.touches[0].pageX,
@@ -39,7 +39,8 @@ function Swiper(el, options_param) {
     "snap": true, // snap to element?
     "slide_strength": 5000, // how far should the element slide when you swipe?
     "transition_speed": 250, // the transition speed when swiped
-    "animation_type": "linear" // type of swipe animation
+    "animation_type": "linear", // type of swipe animation
+    "support_mouse": true // support mouse swiping - experimental
   };
   // override the default options with the params
   for (var k in options_param) {
@@ -47,7 +48,13 @@ function Swiper(el, options_param) {
   }
   
   function init() {
-    // set styles
+    
+    // Stop here if we don't want to support mouse swiping
+    if (!is_touch_device() && !o.support_mouse) {
+      return false;
+    }
+    
+    // set styles on the elements
     set_styles();
     
     // bind resize events
@@ -148,7 +155,7 @@ function Swiper(el, options_param) {
   
   // set some styling on the elements
   function set_styles() {
-    var w = window.innerWidth || document.documentElement.clientWidth;
+    var w = viewport.clientWidth;
 
     style_me(el.parentNode, {"minWidth": "0", "width": w+"px", "overflow": "hidden", "display": "block"});
     
@@ -165,9 +172,9 @@ function Swiper(el, options_param) {
     
     // the vars
     var children = parent.getElementsByTagName("li"),
-      min = 9999999,
-      current_pos = -parseInt(cur_pos),
-      el = null;
+        min = 9999999,
+        current_pos = -parseInt(cur_pos),
+        el = null;
     
     // loop through our childrens to find the closest one to our parent (aka "viewport")
     for (var i = 0; i < children.length; i++) {
@@ -188,9 +195,14 @@ function Swiper(el, options_param) {
     return el;
   };
   
+  // Get the current element in the viewport
+  function get_current_el_in_view() {
+    return get_closest_element(viewport, cur_pos);
+  }
+  
   // Reset the positioning. Go back to the start position
   this.reset = function() {
-    get_closest_element(el, 0);
+    self.goto_el(get_closest_element(viewport, 0));
   };
   
   // Go to specific element
@@ -200,6 +212,8 @@ function Swiper(el, options_param) {
     return goto_el;
   };
   
+  // Go to specific position
+  // @param x {Integer} The x-value to send the list item to (preferable a negative value)
   this.goto_pos = function(x) {
 
     // do the transition!
@@ -213,6 +227,22 @@ function Swiper(el, options_param) {
     
     return x;
   };
+  // Go to next item in list
+  this.goto_next = function() {
+    var current_el = get_current_el_in_view();   
+    var next_el = sibling(current_el);
+    if (!next_el) 
+      return false;
+    self.goto_el(next_el);
+  }
+  // Go to previous item in list
+  this.goto_prev = function() {
+    var current_el = get_current_el_in_view();
+    var prev_el = sibling(current_el, "previous");
+    if (!prev_el) 
+      return false;
+    self.goto_el(prev_el);
+  }
 
   init();
 }
@@ -233,10 +263,18 @@ function style_me(el, styles) {
 
 // Check to see if we can create touch events to see if it's a "touch device"
 function is_touch_device() {
-	try {
-		document.createEvent("TouchEvent");
+  try {
+    document.createEvent("TouchEvent");
     return true;
   } catch (e) {
-		return false;
+    return false;
   }
+}
+// Get next or previous sibling - ignores the textcontent elements
+function sibling(el, dir) {
+  dir = dir || "next";
+  do {
+    el = el[dir+"Sibling"];
+  } while (el && el.nodeType != 1);
+  return el;  
 }
