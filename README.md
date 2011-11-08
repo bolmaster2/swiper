@@ -1,5 +1,5 @@
 # swiper.js
-A lightweight js that makes list "swipeable" for touch devices (such as iphone, ipad, android)
+A lightweight js that makes lists "swipeable" for touch devices (such as iphone, ipad, android). UPDATE: Now supports swiping with the mouse.
 
 swiper.js handles the swiping for you. All you have to do is have a list (wrapped inside a div) in your markup like this:
 
@@ -21,3 +21,5 @@ and then include the js and run it:
 	new Swiper(document.getElementById("touch-container"));
 </script>
 ```
+
+[Check out the demo page](http://blmstr.github.com/swiper/)
