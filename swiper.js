@@ -206,11 +206,19 @@ function Swiper(el, options_param) {
   };
   
   // Go to specific element
-  // @param goto_el {Object} The element to go to
+  // @param goto_el {Li List element} The element to go to
   this.goto_el = function(goto_el) {
     self.goto_pos(-goto_el.offsetLeft);
     return goto_el;
   };
+  
+  // Go to specific element by list item number
+  // @param index {Number} The index of element to go to
+  this.goto_index = function(index) {
+    var goto_el = el.getElementsByTagName("li")[index];
+    self.goto_pos(-goto_el.offsetLeft);
+    return goto_el;
+  }
   
   // Go to specific position
   // @param x {Integer} The x-value to send the list item to (preferable a negative value)
