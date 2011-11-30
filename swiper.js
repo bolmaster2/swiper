@@ -40,7 +40,8 @@ function Swiper(el, options_param) {
     "slide_strength": 5000, // how far should the element slide when you swipe?
     "transition_speed": 250, // the transition speed when swiped
     "animation_type": "linear", // type of swipe animation
-    "support_mouse": true // support mouse swiping - experimental
+    "support_mouse": true, // support mouse swiping - experimental
+    "after_swipe_callback": null
   };
   // override the default options with the params
   for (var k in options_param) {
@@ -138,7 +139,7 @@ function Swiper(el, options_param) {
 
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
-    var slide_adjust = (new Date().getTime() - touch_start_time) * 25,
+    var slide_adjust = (new Date().getTime() - touch_start_time) * 50,
         change_x = o.slide_strength * (Math.abs(start_x) - Math.abs(cur_pos)),
         slide_adjust = change_x && slide_adjust ? Math.round(change_x / slide_adjust) : 0,
         new_left = slide_adjust + cur_pos;
@@ -232,6 +233,13 @@ function Swiper(el, options_param) {
     }
     // save the new position
     cur_pos = x;
+    
+    // Run callback after the transition speed
+    if (o.after_swipe_callback) {
+      setTimeout(function() {
+        o.after_swipe_callback.call(this, x);
+      }, o.transition_speed);
+    }
     
     return x;
   };
