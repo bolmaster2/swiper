@@ -3,12 +3,18 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
+ * @version 0.5
+ * Licensed under the MIT license
+ *
  * @param el {HTMLUListElement} The list element
  * @param options_param {Object} The options object
  *
  **/
 function Swiper(el, options_param) {
   var self = this;
+  
+  // expose "public" vars
+  this.el = el;
   
   // private vars
   var viewport = el.parentNode,
