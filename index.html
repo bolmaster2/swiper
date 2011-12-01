@@ -4,14 +4,20 @@
     <meta charset="utf-8" />
     <title>swiper.js</title>
     <link href='http://fonts.googleapis.com/css?family=Bangers' rel='stylesheet' type='text/css'>
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
     <style>
     
     .swipes {
-      width: 700px;
+      width: 100%;
     }
     /* center the images inside the list item */
     .swipes ul > li {
       text-align: center;
+    }
+    .swipes ul > li img {
+      max-width: 100%;
     }
 
     /* styling for the example */
@@ -44,13 +50,13 @@
       font-size: 14px;
     }
     </style>
-  
+    
   </head>
 
   <body>
     
     <h1 id="logo">swiper.js</h1>
-    <p>A really lightweight <em>(only 1.7k)</em> library to make lists <i>swipeable</i> on touch devices (iphone, android).</p>
+    <p>A really lightweight library to make lists <i>swipeable</i> on touch devices (iphone, android).</p>
     
     <h2 id="how">How?</h2>
     <p>swiper.js handles the swiping for you. All you have to do is have a list (wrapped inside a div) in your markup like this:</p>
@@ -67,7 +73,7 @@
 <pre><code>new Swiper(document.getElementById("my-list"));</code></pre>
 
 	  <h2 id="demo">Demo</h2>
-    <p>Just swipe the images! <br/> <small>(if you're not using a touch device you'll just see an ordinary list with the images.)</small></p>
+    <p>Just swipe the images!</p>
 
     <div class="swipes">
       <ul id="my-list">

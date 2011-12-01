@@ -11,7 +11,7 @@ function Swiper(el, options_param) {
   var self = this;
   
   // private vars
-  var viewport = el,
+  var viewport = el.parentNode,
       start_x = 0,
       start_y = 0,
       cur_pos = 0,
@@ -63,7 +63,7 @@ function Swiper(el, options_param) {
     window.addEventListener("orientationchange", set_styles);
     
     // bind touch start event
-    viewport.addEventListener(events.start, touch_start, false);
+    el.addEventListener(events.start, touch_start, false);
   }
   
   // touch start
@@ -79,18 +79,18 @@ function Swiper(el, options_param) {
     
     // reset the transition duration
     for (var k in dom_prefixes) {
-      viewport.style[dom_prefixes[k] + "TransitionDuration"] = "0ms";
+      el.style[dom_prefixes[k] + "TransitionDuration"] = "0ms";
     }
     
     // bind the move and end events
-    viewport.addEventListener(events.move, touch_move, false);
-    viewport.addEventListener(events.stop, touch_end, false);
+    el.addEventListener(events.move, touch_move, false);
+    el.addEventListener(events.stop, touch_end, false);
   };
   
   // cancel the touch - unbind the events
   function cancel_touch() {
-    viewport.removeEventListener(events.move, touch_move);
-    viewport.removeEventListener(events.stop, touch_end);
+    el.removeEventListener(events.move, touch_move);
+    el.removeEventListener(events.stop, touch_end);
   }
   
   // touch move
@@ -116,10 +116,10 @@ function Swiper(el, options_param) {
         // the swipe is mostly going in the x-direction - let the elements follow the finger
         cur_pos = start_x + diff - start_x_offset;
 
-        // move the viewport with css3 transform
+        // move the el with css3 transform
         for (var k in dom_prefixes) {
-          viewport.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + cur_pos + 'px, 0px, 0px)';
-          viewport.style[dom_prefixes[k] + "Transform"] = 'translate(' + cur_pos + 'px, 0px)';
+          el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + cur_pos + 'px, 0px, 0px)';
+          el.style[dom_prefixes[k] + "Transform"] = 'translate(' + cur_pos + 'px, 0px)';
         }
 
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
@@ -135,7 +135,7 @@ function Swiper(el, options_param) {
   // touch end
   function touch_end(e) {
     lock_x = false;
-    viewport.removeEventListener(events.move, touch_move, false);
+    el.removeEventListener(events.move, touch_move, false);
 
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
@@ -146,7 +146,7 @@ function Swiper(el, options_param) {
 
     // snap to closest element
     if (o.snap) {
-      new_left = -get_closest_element(viewport, new_left).offsetLeft;
+      new_left = -get_closest_element(el, new_left).offsetLeft;
     }
     
     // Go to the new position!
@@ -156,9 +156,11 @@ function Swiper(el, options_param) {
   
   // set some styling on the elements
   function set_styles() {
-    var w = viewport.clientWidth;
-
-    style_me(el.parentNode, {"minWidth": "0", "width": w+"px", "overflow": "hidden", "display": "block"});
+    // get the width from the viewports parent
+    var w = viewport.parentNode.clientWidth;
+    
+    // style the viewport
+    style_me(viewport, {"minWidth": "0", "width": w+"px", "overflow": "hidden", "display": "block"});
     
     style_me(el, {"width": "999920px", "display": "block"});
     var els = el.getElementsByTagName("li");
@@ -198,12 +200,12 @@ function Swiper(el, options_param) {
   
   // Get the current element in the viewport
   function get_current_el_in_view() {
-    return get_closest_element(viewport, cur_pos);
+    return get_closest_element(el, cur_pos);
   }
   
   // Reset the positioning. Go back to the start position
   this.reset = function() {
-    self.goto_el(get_closest_element(viewport, 0));
+    self.goto_el(get_closest_element(el, 0));
   };
   
   // Go to specific element
@@ -227,9 +229,9 @@ function Swiper(el, options_param) {
 
     // do the transition!
     for (var k in dom_prefixes) {
-      viewport.style[dom_prefixes[k] + "Transition"] = 'all '+o.transition_speed+'ms ' + o.animation_type;
-      viewport.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + x + 'px, 0px, 0px)';
-      viewport.style[dom_prefixes[k] + "Transform"] = 'translate(' + x + 'px, 0px)';
+      el.style[dom_prefixes[k] + "Transition"] = 'all '+o.transition_speed+'ms ' + o.animation_type;
+      el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + x + 'px, 0px, 0px)';
+      el.style[dom_prefixes[k] + "Transform"] = 'translate(' + x + 'px, 0px)';
     }
     // save the new position
     cur_pos = x;
