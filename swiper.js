@@ -7,10 +7,10 @@
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
- * @param options_param {Object} The options object
+ * @param params {Object} The options object
  *
  **/
-function Swiper(el, options_param) {
+function Swiper(el, params) {
   var self = this;
   
   // expose "public" vars
@@ -50,8 +50,8 @@ function Swiper(el, options_param) {
     "after_swipe_callback": null
   };
   // override the default options with the params
-  for (var k in options_param) {
-    o[k] = options_param[k];
+  for (var k in params) {
+    o[k] = params[k];
   }
   
   function init() {
