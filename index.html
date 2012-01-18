@@ -95,7 +95,9 @@
     var list_el = document.getElementById("my-list");
 
     // Init the swiper!
-    var swiper = new Swiper(list_el);
+    var swiper = new Swiper(list_el, {
+      support_mouse: true // enable mouse swiping in the browser (experimental)
+    });
     
 
     // Set the next and previous click events

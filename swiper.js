@@ -46,7 +46,7 @@ function Swiper(el, params) {
     "slide_strength": 5000, // how far should the element slide when you swipe?
     "transition_speed": 250, // the transition speed when swiped
     "animation_type": "linear", // type of swipe animation
-    "support_mouse": true, // support mouse swiping - experimental
+    "support_mouse": false, // support mouse swiping - experimental
     "after_swipe_callback": null
   };
   // override the default options with the params
