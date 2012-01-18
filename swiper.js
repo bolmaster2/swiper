@@ -56,8 +56,8 @@ function Swiper(el, params) {
   
   function init() {
     
-    // Stop here if we don't want to support mouse swiping
-    if (!is_touch_device() && !o.support_mouse) {
+    // Stop here if we don't want to support mouse swiping on non touch devices (or when addeventlistener isn't supported)
+    if ((!is_touch_device() && !o.support_mouse) || !window.addEventListener) {
       return false;
     }
     
