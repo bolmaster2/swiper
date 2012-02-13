@@ -8,16 +8,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     <style>
-    
+    * {}
     .swipes {
       width: 100%;
+      
     }
+    /* fix flickering bug in ios - http://stackoverflow.com/questions/2946748/iphone-webkit-css-animations-cause-flicker */
+    .swipes ul {-webkit-backface-visibility: hidden;}
+    
     /* center the images inside the list item */
     .swipes ul > li {
       text-align: center;
+      
     }
     .swipes ul > li img {
       max-width: 100%;
+      
     }
 
     /* styling for the example */
@@ -88,7 +94,7 @@
     <p><a href="https://github.com/blmstr/swiper">Get it from github here</a></p>
 
     <!-- include the swiper javascript -->
-    <script src="swiper.js"></script>
+    <script src="swiper.js?1"></script>
     <script>
 
     // The list element
@@ -96,7 +102,7 @@
 
     // Init the swiper!
     var swiper = new Swiper(list_el, {
-      support_mouse: true // enable mouse swiping in the browser (experimental)
+      support_mouse: false // enable mouse swiping in the browser (experimental)
     });
     
 
