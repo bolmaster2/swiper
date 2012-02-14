@@ -237,7 +237,6 @@ function Swiper(el, params) {
     for (var k in dom_prefixes) {
       el.style[dom_prefixes[k] + "Transition"] = 'all '+o.transition_speed+'ms ' + o.animation_type;
       el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + x + 'px, 0px, 0px)';
-      el.style[dom_prefixes[k] + "Transform"] = 'translate(' + x + 'px, 0px)';
     }
     // save the new position
     cur_pos = x;
