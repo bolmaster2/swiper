@@ -286,12 +286,7 @@ function style_me(el, styles) {
 
 // Check to see if we can create touch events to see if it's a "touch device"
 function is_touch_device() {
-  try {
-    document.createEvent("TouchEvent");
-    return true;
-  } catch (e) {
-    return false;
-  }
+  return !!('ontouchstart' in window);
 }
 // Get next or previous sibling - ignores the textcontent elements
 function sibling(el, dir) {
