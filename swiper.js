@@ -105,14 +105,14 @@ function Swiper(el, params) {
     }
     
     // bind the move and end events
-    el.addEventListener(events.move, touch_move, false);
+    window.addEventListener(events.move, touch_move, false);
     window.addEventListener(events.stop, touch_end, false);
   };
   
   // cancel the touch - unbind the events
   function cancel_touch() {
     window.swiper_active = false;
-    el.removeEventListener(events.move, touch_move);
+    window.removeEventListener(events.move, touch_move);
     window.removeEventListener(events.stop, touch_end);
   }
   
@@ -167,7 +167,7 @@ function Swiper(el, params) {
     // set global swiper actice var to false to make room for another swiper
     window.swiper_active = false;
     lock_x = false;
-    el.removeEventListener(events.move, touch_move, false);
+    window.removeEventListener(events.move, touch_move, false);
 
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
