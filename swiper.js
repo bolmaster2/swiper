@@ -82,7 +82,15 @@ function Swiper(el, params) {
   function touch_start(e) {
     if (!is_touch_device())
       e.preventDefault();
-      
+  
+    // Create support for swipers inside swipers. If there's already a swiper active. Don't go further.
+    if (typeof window.swiper_active == "undefined" || window.swiper_active == false) {
+      window.swiper_active = true;
+    } else {
+      window.swiper_active = true;
+      return false;
+    }
+  
     delta_x = 0;
 
     // get the start values
@@ -103,6 +111,7 @@ function Swiper(el, params) {
   
   // cancel the touch - unbind the events
   function cancel_touch() {
+    window.swiper_active = false;
     el.removeEventListener(events.move, touch_move);
     window.removeEventListener(events.stop, touch_end);
   }
@@ -132,7 +141,7 @@ function Swiper(el, params) {
         
         // increase resistance if first or last slide
         if (index == 0 && delta_x > 0 || index == el.getElementsByTagName("li").length - 1 && delta_x < 0) {
-          delta_x = delta_x / ( Math.abs(delta_x) / viewport.clientWidth + 1 );
+          delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1.05;
         } else {
           delta_x = 0;
         }
@@ -155,6 +164,8 @@ function Swiper(el, params) {
   
   // touch end
   function touch_end(e) {
+    // set global swiper actice var to false to make room for another swiper
+    window.swiper_active = false;
     lock_x = false;
     el.removeEventListener(events.move, touch_move, false);
 
