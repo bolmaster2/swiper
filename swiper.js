@@ -63,13 +63,15 @@ function Swiper(el, params) {
     }
     
     // set styles on the elements
-    if (o.set_styles)
+    if (o.set_styles) {
       set_styles();
+      window.addEventListener("orientationchange", set_styles);
+      // bind resize events
+      window.addEventListener("resize", set_styles);
+    }
+      
     
-    // bind resize events
-    window.addEventListener("resize", set_styles);
-    window.addEventListener("orientationchange", set_styles);
-    
+      
     // bind touch start event
     el.addEventListener(events.start, touch_start, false);
   }
