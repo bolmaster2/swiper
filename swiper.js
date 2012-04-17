@@ -26,7 +26,9 @@ function Swiper(el, params) {
       start_y_offset = 0,
       direction = null, 
       lock_x = false,
-      dom_prefixes = "Webkit Moz O ms Khtml".split(" ");
+      dom_prefixes = "Webkit Moz O ms Khtml".split(" "),
+      delta_x = 0,
+      index = 0;
   
   function event_props(e) {
     return {
@@ -80,6 +82,8 @@ function Swiper(el, params) {
   function touch_start(e) {
     if (!is_touch_device())
       e.preventDefault();
+      
+    delta_x = 0;
 
     // get the start values
     start_x = cur_pos;
@@ -94,13 +98,13 @@ function Swiper(el, params) {
     
     // bind the move and end events
     el.addEventListener(events.move, touch_move, false);
-    el.addEventListener(events.stop, touch_end, false);
+    window.addEventListener(events.stop, touch_end, false);
   };
   
   // cancel the touch - unbind the events
   function cancel_touch() {
     el.removeEventListener(events.move, touch_move);
-    el.removeEventListener(events.stop, touch_end);
+    window.removeEventListener(events.stop, touch_end);
   }
   
   // touch move
@@ -113,23 +117,30 @@ function Swiper(el, params) {
       cancel_touch();
     } else {
       // the x and y movement
-      var dx = event_props(e).page_x - start_x_offset,
-      dy = event_props(e).page_y - start_y_offset; 
+      var delta_x = event_props(e).page_x - start_x_offset,
+      delta_y = event_props(e).page_y - start_y_offset; 
        
        
       // is the swipe more up/down then left/right? if so - cancel the touch events
-      if ((Math.abs(dy) > 1 && Math.abs(dx) < 5) && !lock_x) {   
+      if ((Math.abs(delta_y) > 1 && Math.abs(delta_x) < 5) && !lock_x) {   
         cancel_touch();
         return;
       } else {
 
         // the swipe is mostly going in the x-direction - let the elements follow the finger
         cur_pos = start_x + diff - start_x_offset;
+        
+        // increase resistance if first or last slide
+        if (index == 0 && delta_x > 0 || index == el.getElementsByTagName("li").length - 1 && delta_x < 0) {
+          delta_x = delta_x / ( Math.abs(delta_x) / viewport.clientWidth + 1 );
+        } else {
+          delta_x = 0;
+        }
 
         // move the el with css3 transform
         for (var k in dom_prefixes) {
-          el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + cur_pos + 'px, 0px, 0px)';
-          el.style[dom_prefixes[k] + "Transform"] = 'translate(' + cur_pos + 'px, 0px)';
+          el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + cur_pos) + 'px, 0px, 0px)';
+          // el.style[dom_prefixes[k] + "Transform"] = 'translate(' + cur_pos + 'px, 0px)';
         }
 
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
@@ -156,7 +167,16 @@ function Swiper(el, params) {
 
     // snap to closest element
     if (o.snap) {
-      new_left = -get_closest_element(el, new_left).offsetLeft;
+      var closest_el = get_closest_element(el, new_left);
+      new_left = -closest_el.offsetLeft;
+      
+      // update index
+      for (var i = 0, len = el.getElementsByTagName("li").length; i < len; i++) {
+        if (el.getElementsByTagName("li")[i] === closest_el) {
+          index = i;
+        }
+      }
+      console.log("set index to: "+index);
     }
     
     // Go to the new position!
