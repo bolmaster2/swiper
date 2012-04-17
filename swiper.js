@@ -140,7 +140,7 @@ function Swiper(el, params) {
         cur_pos = start_x + diff - start_x_offset;
         
         // increase resistance if first or last slide
-        if (index == 0 && delta_x > 0 || index == el.getElementsByTagName("li").length - 1 && delta_x < 0) {
+        if (index == 0 && delta_x > 0 || index == el.children.length - 1 && delta_x < 0) {
           delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1.05;
         } else {
           delta_x = 0;
@@ -180,13 +180,7 @@ function Swiper(el, params) {
     if (o.snap) {
       var closest_el = get_closest_element(el, new_left);
       new_left = -closest_el.offsetLeft;
-      
-      // update index
-      for (var i = 0, len = el.getElementsByTagName("li").length; i < len; i++) {
-        if (el.getElementsByTagName("li")[i] === closest_el) {
-          index = i;
-        }
-      }
+    
     }
     
     // Go to the new position!
@@ -257,8 +251,9 @@ function Swiper(el, params) {
   
   // Go to specific element by list item number
   // @param index {Number} The index of element to go to
-  this.goto_index = function(index) {
-    var goto_el = el.getElementsByTagName("li")[index];
+  this.goto_index = function(i) {
+    index = i;
+    var goto_el = el.getElementsByTagName("li")[i];
     self.goto_pos(-goto_el.offsetLeft);
     return goto_el;
   }
@@ -266,6 +261,12 @@ function Swiper(el, params) {
   // Go to specific position
   // @param x {Integer} The x-value to send the list item to (preferable a negative value)
   this.goto_pos = function(x) {
+    // update index
+    for (var i = 0, len = el.children.length; i < len; i++) {
+      if (-el.children[i].offsetLeft == x) {
+        index = i;
+      }
+    }
 
     // do the transition!
     for (var k in dom_prefixes) {
@@ -278,7 +279,7 @@ function Swiper(el, params) {
     // Run callback after the transition speed
     if (o.after_swipe_callback) {
       setTimeout(function() {
-        o.after_swipe_callback.call(this, x);
+        o.after_swipe_callback.call(self);
       }, o.transition_speed);
     }
     
@@ -299,6 +300,14 @@ function Swiper(el, params) {
     if (!prev_el) 
       return false;
     self.goto_el(prev_el);
+  }
+  
+  this.get_index = function() {
+    return index;
+  }
+  this.set_index = function(i) {
+    index = i;
+    cur_pos = -el.children[index].offsetLeft;
   }
 
   init();
