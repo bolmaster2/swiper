@@ -214,7 +214,7 @@ function Swiper(el, params) {
   function get_closest_element(parent, cur_pos) {
     
     // the vars
-    var children = parent.getElementsByTagName("li"),
+    var children = parent.childNodes,
         min = 9999999,
         current_pos = -parseInt(cur_pos),
         el = null;
