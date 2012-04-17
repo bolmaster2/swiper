@@ -176,7 +176,6 @@ function Swiper(el, params) {
           index = i;
         }
       }
-      console.log("set index to: "+index);
     }
     
     // Go to the new position!
