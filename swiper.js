@@ -47,7 +47,8 @@ function Swiper(el, params) {
     "transition_speed": 250, // the transition speed when swiped
     "animation_type": "linear", // type of swipe animation
     "support_mouse": false, // support mouse swiping - experimental
-    "after_swipe_callback": null
+    "after_swipe_callback": null,
+    "set_styles": true // should swiper set css styles on the elements?
   };
   // override the default options with the params
   for (var k in params) {
@@ -62,7 +63,8 @@ function Swiper(el, params) {
     }
     
     // set styles on the elements
-    set_styles();
+    if (o.set_styles)
+      set_styles();
     
     // bind resize events
     window.addEventListener("resize", set_styles);
