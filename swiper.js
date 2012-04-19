@@ -45,12 +45,13 @@ function Swiper(el, params) {
   // default options
   var o = {
     "snap": true, // snap to element?
-    "slide_strength": 5000, // how far should the element slide when you swipe?
+    "slide_strength": 25000, // how far should the element slide when you swipe?
     "transition_speed": 250, // the transition speed when swiped
     "animation_type": "linear", // type of swipe animation
     "support_mouse": false, // support mouse swiping - experimental
     "after_swipe_callback": null,
-    "set_styles": true // should swiper set css styles on the elements?
+    "set_styles": true, // should swiper set css styles on the elements?
+    "only_slide_one_el": true // should we be able to "swipe away" the element more than one element? No!
   };
   // override the default options with the params
   for (var k in params) {
@@ -128,7 +129,7 @@ function Swiper(el, params) {
       // the x and y movement
       var delta_x = event_props(e).page_x - start_x_offset,
       delta_y = event_props(e).page_y - start_y_offset; 
-       
+      
        
       // is the swipe more up/down then left/right? if so - cancel the touch events
       if ((Math.abs(delta_y) > 1 && Math.abs(delta_x) < 5) && !lock_x) {   
@@ -141,7 +142,7 @@ function Swiper(el, params) {
         
         // increase resistance if first or last slide
         if (index == 0 && delta_x > 0 || index == el.children.length - 1 && delta_x < 0) {
-          delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1.05;
+          delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
         } else {
           delta_x = 0;
         }
@@ -175,12 +176,33 @@ function Swiper(el, params) {
         change_x = o.slide_strength * (Math.abs(start_x) - Math.abs(cur_pos)),
         slide_adjust = change_x && slide_adjust ? Math.round(change_x / slide_adjust) : 0,
         new_left = slide_adjust + cur_pos;
-
+    
+    // abort if we slide to the left and on the first slide
+    if (((start_x - cur_pos) < 0 && index == 0) || ((start_x - cur_pos) > 0 && index == el.children.length-1)) {
+      self.goto_index(index);
+      return;
+    }
+    
     // snap to closest element
     if (o.snap) {
       var closest_el = get_closest_element(el, new_left);
+      
+      // how big is the difF?
+      var diff = Math.abs(index - get_index_of_el(closest_el));
+      // never swipe away more than one element. if diff is bigger than 0 we have swiped good enough to send away
+      if (o.only_slide_one_el && diff > 0) {
+
+        // to the left
+        if ((start_x - cur_pos) < 0) {
+          self.goto_index(index-1)
+        } else {
+          self.goto_index(index+1)
+        }
+        
+        return;
+      }
+      
       new_left = -closest_el.offsetLeft;
-    
     }
     
     // Go to the new position!
@@ -237,6 +259,15 @@ function Swiper(el, params) {
     return get_closest_element(el, cur_pos);
   }
   
+  // get index of specific el
+  function get_index_of_el(el) {
+    for (var i = 0, len = self.el.children.length; i < len; i++) {
+      if (self.el.children[i] == el) {
+        return i;
+      }
+    }
+  }
+  
   // Reset the positioning. Go back to the start position
   this.reset = function() {
     self.goto_el(get_closest_element(el, 0));
@@ -253,7 +284,7 @@ function Swiper(el, params) {
   // @param index {Number} The index of element to go to
   this.goto_index = function(i) {
     index = i;
-    var goto_el = el.getElementsByTagName("li")[i];
+    var goto_el = el.children[i];
     self.goto_pos(-goto_el.offsetLeft);
     return goto_el;
   }
