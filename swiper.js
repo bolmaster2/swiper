@@ -140,6 +140,18 @@ function Swiper(el, params) {
         // the swipe is mostly going in the x-direction - let the elements follow the finger
         cur_pos = start_x + diff - start_x_offset;
         
+        // in which direction are we swiping?
+        var dir = (diff - start_x_offset > 0) ? 'left' : 'right';
+        
+        // add direction classes
+        if (dir == 'left' && !has_class(el, 'left')) {
+          remove_class(el, 'swiping-right');
+          add_class(el, 'swiping-'+dir);
+        } else if (dir == 'right' && !has_class(el, 'right')) {
+          remove_class(el, 'swiping-left');
+          add_class(el, 'swiping-'+dir);
+        }
+        
         // increase resistance if first or last slide
         if (index == 0 && delta_x > 0 || index == el.children.length - 1 && delta_x < 0) {
           delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
@@ -307,12 +319,18 @@ function Swiper(el, params) {
     // save the new position
     cur_pos = x;
     
-    // Run callback after the transition speed
-    if (o.after_swipe_callback) {
+     // Run callback after the transition speed
       setTimeout(function() {
-        o.after_swipe_callback.call(self);
+        
+        // remove any swiping direction classes
+        remove_class(el, 'swiping-left');
+        remove_class(el, 'swiping-right');
+        
+        // after swipe callback
+        if (o.after_swipe_callback)
+          o.after_swipe_callback.call(self);
+          
       }, o.transition_speed);
-    }
     
     return x;
   };
@@ -369,4 +387,22 @@ function sibling(el, dir) {
     el = el[dir+"Sibling"];
   } while (el && el.nodeType != 1);
   return el;  
+}
+
+// has class
+function has_class(ele,cls) {
+  return ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
+}
+
+// add class
+function add_class(ele,cls) {
+  if (!has_class(ele,cls)) ele.className += " "+cls.replace(/^\s|\s$/,'');
+}
+
+// remove class
+function remove_class(ele,cls) {
+  if (has_class(ele,cls)) {
+    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
+    ele.className=ele.className.replace(reg,' ').replace(/^\s|\s$/,'');
+  }
 }
