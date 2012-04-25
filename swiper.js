@@ -15,12 +15,14 @@ function Swiper(el, params) {
   
   // expose "public" vars
   this.el = el;
+  this.parent_swiper = null;
+  
+  this.pos = 0;
   
   // private vars
   var viewport = el.parentNode,
       start_x = 0,
       start_y = 0,
-      cur_pos = 0,
       touch_start_time,
       start_x_offset = 0,
       start_y_offset = 0,
@@ -28,7 +30,9 @@ function Swiper(el, params) {
       lock_x = false,
       dom_prefixes = "Webkit Moz O ms Khtml".split(" "),
       delta_x = 0,
-      index = 0;
+      index = 0,
+      moving_el, // the current moving element
+      moving_parent = false; // status var: are we moving a parent?
   
   function event_props(e) {
     return {
@@ -65,6 +69,18 @@ function Swiper(el, params) {
       return false;
     }
     
+    // if swipers arr doenst yet exist - go ahead and create it
+    if (typeof window.swipers == 'undefined')
+      window.swipers = [];
+
+    // push this into swipers arr
+    window.swipers.push(self);
+
+    for (var i = 0, len = window.swipers.length; i < len; i++) {
+      if (find_parent(self.el, window.swipers[i].el))
+        self.parent_swiper = window.swipers[i];
+    }
+    
     // set styles on the elements
     if (o.set_styles) {
       set_styles();
@@ -83,7 +99,7 @@ function Swiper(el, params) {
   function touch_start(e) {
     if (!is_touch_device())
       e.preventDefault();
-  
+
     // Create support for swipers inside swipers. If there's already a swiper active. Don't go further.
     if (typeof window.swiper_active == "undefined" || window.swiper_active == false) {
       window.swiper_active = true;
@@ -95,7 +111,7 @@ function Swiper(el, params) {
     delta_x = 0;
 
     // get the start values
-    start_x = cur_pos;
+    start_x = self.pos;
     start_x_offset = event_props(e).page_x;
     start_y_offset = event_props(e).page_y;
     touch_start_time = new Date().getTime();
@@ -119,7 +135,7 @@ function Swiper(el, params) {
   
   // touch move
   function touch_move(e) {
-
+    moving_parent = false;
     var diff = event_props(e).page_x;
     
     // cancel touch if more than 1 fingers
@@ -130,6 +146,7 @@ function Swiper(el, params) {
       var delta_x = event_props(e).page_x - start_x_offset,
       delta_y = event_props(e).page_y - start_y_offset; 
       
+       console.log(delta_x);
        
       // is the swipe more up/down then left/right? if so - cancel the touch events
       if ((Math.abs(delta_y) > 1 && Math.abs(delta_x) < 5) && !lock_x) {   
@@ -138,7 +155,7 @@ function Swiper(el, params) {
       } else {
 
         // the swipe is mostly going in the x-direction - let the elements follow the finger
-        cur_pos = start_x + diff - start_x_offset;
+        self.pos = start_x + diff - start_x_offset;
         
         // in which direction are we swiping?
         var dir = (diff - start_x_offset > 0) ? 'left' : 'right';
@@ -152,17 +169,29 @@ function Swiper(el, params) {
           add_class(el, 'swiping-'+dir);
         }
         
-        // increase resistance if first or last slide
+        // if we are on the first or last slide
         if (index == 0 && delta_x > 0 || index == el.children.length - 1 && delta_x < 0) {
-          delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
-        } else {
+          
+          // if we have a parent - move that!
+          if (self.parent_swiper) {
+            moving_parent = true;
+            moving_el = self.parent_swiper.el;
+            self.pos = self.parent_swiper.pos;
+            delta_x = -delta_x;
+          } else {
+            // increase resistance
+            delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
+            moving_el = el;
+          }
+        } else {      
           delta_x = 0;
+          moving_el = el;
         }
-
+        
+        
         // move the el with css3 transform
         for (var k in dom_prefixes) {
-          el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + cur_pos) + 'px, 0px, 0px)';
-          // el.style[dom_prefixes[k] + "Transform"] = 'translate(' + cur_pos + 'px, 0px)';
+          moving_el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + self.pos) + 'px, 0px, 0px)';
         }
 
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
@@ -177,35 +206,43 @@ function Swiper(el, params) {
   
   // touch end
   function touch_end(e) {
+    
+    console.log("moving parent: "+moving_parent);
+
+    
+    
     // set global swiper actice var to false to make room for another swiper
     window.swiper_active = false;
     lock_x = false;
     window.removeEventListener(events.move, touch_move, false);
-
+    
+    // if (moving_parent)
+    //   return false;
+    
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
     var slide_adjust = (new Date().getTime() - touch_start_time) * 50,
-        change_x = o.slide_strength * (Math.abs(start_x) - Math.abs(cur_pos)),
+        change_x = o.slide_strength * (Math.abs(start_x) - Math.abs(self.pos)),
         slide_adjust = change_x && slide_adjust ? Math.round(change_x / slide_adjust) : 0,
-        new_left = slide_adjust + cur_pos;
+        new_left = slide_adjust + self.pos;
     
     // abort if we slide to the left and on the first slide
-    if (((start_x - cur_pos) < 0 && index == 0) || ((start_x - cur_pos) > 0 && index == el.children.length-1)) {
+    if (((start_x - self.pos) < 0 && index == 0) || ((start_x - self.pos) > 0 && index == el.children.length-1)) {
       self.goto_index(index);
       return;
     }
     
     // snap to closest element
     if (o.snap) {
-      var closest_el = get_closest_element(el, new_left);
-      
+      var closest_el = get_closest_element(moving_el, new_left);
+
       // how big is the difF?
       var diff = Math.abs(index - get_index_of_el(closest_el));
       // never swipe away more than one element. if diff is bigger than 0 we have swiped good enough to send away
       if (o.only_slide_one_el && diff > 0) {
 
         // to the left
-        if ((start_x - cur_pos) < 0) {
+        if ((start_x - self.pos) < 0) {
           self.goto_index(index-1)
         } else {
           self.goto_index(index+1)
@@ -218,8 +255,12 @@ function Swiper(el, params) {
     }
     
     // Go to the new position!
-    self.goto_pos(new_left);
-    
+    if (moving_parent)
+      self.parent_swiper.goto_pos(new_left);
+    else
+      self.goto_pos(new_left);
+      
+    console.log("new left: "+new_left);
   };
   
   // set some styling on the elements
@@ -239,12 +280,12 @@ function Swiper(el, params) {
   }
 
   // Get the closest element to a "viewport"
-  function get_closest_element(parent, cur_pos) {
+  function get_closest_element(parent, pos) {
     
     // the vars
     var children = parent.childNodes,
         min = 9999999,
-        current_pos = -parseInt(cur_pos),
+        current_pos = -parseInt(pos),
         el = null;
     
     // loop through our childrens to find the closest one to our parent (aka "viewport")
@@ -268,7 +309,7 @@ function Swiper(el, params) {
   
   // Get the current element in the viewport
   function get_current_el_in_view() {
-    return get_closest_element(el, cur_pos);
+    return get_closest_element(el, self.pos);
   }
   
   // get index of specific el
@@ -317,7 +358,7 @@ function Swiper(el, params) {
       el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + x + 'px, 0px, 0px)';
     }
     // save the new position
-    cur_pos = x;
+    self.pos = x;
     
      // Run callback after the transition speed
       setTimeout(function() {
@@ -356,7 +397,7 @@ function Swiper(el, params) {
   }
   this.set_index = function(i) {
     index = i;
-    cur_pos = -el.children[index].offsetLeft;
+    self.pos = -el.children[index].offsetLeft;
   }
 
   init();
@@ -405,4 +446,16 @@ function remove_class(ele,cls) {
     var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
     ele.className=ele.className.replace(reg,' ').replace(/^\s|\s$/,'');
   }
+}
+
+// test if child is child of parent
+function find_parent(child, parent) {
+  var child_parent = child.parentNode;
+  while (child_parent != parent) {
+    if (child_parent.parentNode)
+      child_parent = child_parent.parentNode;
+    else
+      return false;
+  }
+  return child_parent;
 }
