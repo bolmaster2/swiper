@@ -16,6 +16,25 @@ function Swiper(el, params) {
   // expose "public" vars
   this.el = el;
   
+  // if swipers arr doenst yet exist - go ahead and create it
+  if (typeof window.swipers == 'undefined')
+    window.swipers = [];
+    
+  // push this into swipers arr
+  window.swipers.push(this);
+  
+  get_parent();
+  
+  function get_parent() {
+    
+    for (var i=0; i < window.swipers.length; i++) {
+
+      if (find_parent(self.el, window.swipers[i].el))
+        self.parent_swiper = find_parent(self.el, window.swipers[i].el);
+    }
+    
+  }
+  
   // private vars
   var viewport = el.parentNode,
       start_x = 0,
@@ -152,16 +171,35 @@ function Swiper(el, params) {
           add_class(el, 'swiping-'+dir);
         }
         
-        // increase resistance if first or last slide
+        /*
+          TODO swipe parent
+        */
+        var moving_el;
+        
+        // if we are on the first or last slide
         if (index == 0 && delta_x > 0 || index == el.children.length - 1 && delta_x < 0) {
-          delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
+          
+          // increase resistance
+          //delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
+          
+          if (self.parent_swiper) {
+            moving_el = self.parent_swiper;
+          } else {
+            moving_el = el;
+          }
+          
         } else {
+          
           delta_x = 0;
+          
+          moving_el = el;
+          
         }
-
+        
+        
         // move the el with css3 transform
         for (var k in dom_prefixes) {
-          el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + cur_pos) + 'px, 0px, 0px)';
+          moving_el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + cur_pos) + 'px, 0px, 0px)';
           // el.style[dom_prefixes[k] + "Transform"] = 'translate(' + cur_pos + 'px, 0px)';
         }
 
@@ -405,4 +443,18 @@ function remove_class(ele,cls) {
     var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
     ele.className=ele.className.replace(reg,' ').replace(/^\s|\s$/,'');
   }
+}
+
+function find_parent(child, parent) {
+  var test = child.parentNode;
+  while(test != parent) {
+    
+    if (test.parentNode)
+      test = test.parentNode;
+    else
+      return false;
+  
+  }
+  
+  return test;
 }
