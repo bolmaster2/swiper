@@ -19,6 +19,8 @@ function Swiper(el, params) {
   
   this.pos = 0;
   this.start_x = 0;
+  this.index = 0;
+  this.current_offset = 0;
   
   // private vars
   var viewport = el.parentNode,
@@ -30,7 +32,6 @@ function Swiper(el, params) {
       lock_x = false,
       dom_prefixes = "Webkit Moz O ms Khtml".split(" "),
       delta_x = 0,
-      index = 0,
       moving_el, // the current moving element
       moving_parent = false, // status var: are we moving a parent?
       children_num = el.children.length;
@@ -70,11 +71,11 @@ function Swiper(el, params) {
       return false;
     }
     
-    // if swipers arr doenst yet exist - go ahead and create it
+    // if swipers array doenst yet exist - go ahead and create it
     if (typeof window.swipers == 'undefined')
       window.swipers = [];
 
-    // push this into swipers arr
+    // push this into swipers array
     window.swipers.push(self);
 
     for (var i = 0, len = window.swipers.length; i < len; i++) {
@@ -89,9 +90,7 @@ function Swiper(el, params) {
       // bind resize events
       window.addEventListener("resize", set_styles);
     }
-      
-    
-      
+
     // bind touch start event
     el.addEventListener(events.start, touch_start, false);
   }
@@ -101,33 +100,29 @@ function Swiper(el, params) {
     if (!is_touch_device())
       e.preventDefault();
     
-    console.log("swiping: "+self.el.id);
-    
-    // console.log("another swiper active: "+window.swiper_active);
-    
-    // Create support for swipers inside swipers. If there's already a swiper active. Don't go further.
-    if (typeof window.swiper_active == "undefined" || window.swiper_active == false) {
-      window.swiper_active = true;
-    } else {
-      // window.swiper_active = true;
-      console.log("another swiper active. stop.");
-      return false;
-    }
-  
-    delta_x = 0;
-
-    // get the start values
-    self.start_x = self.pos;
-    // console.log("start x: "+self.start_x);
-    start_x_offset = event_props(e).page_x;
-    start_y_offset = event_props(e).page_y;
-    touch_start_time = new Date().getTime();
-    
     // reset the transition duration
     for (var k in dom_prefixes) {
       el.style[dom_prefixes[k] + "TransitionDuration"] = "0ms";
     }
     
+    // Create support for swipers inside swipers. If there's already a swiper active. Don't go further.
+    if (typeof window.swiper_active == "undefined" || window.swiper_active == false) {
+      window.swiper_active = true;
+    } else {
+      // another swiper is active. stop this
+      return false;
+    }
+    // reset the delta x
+    delta_x = 0;
+
+    // get the start values
+    self.start_x = self.pos;
+    self.start_x_parent = self.parent_swiper ? self.parent_swiper.start_x : null;
+
+    start_x_offset = event_props(e).page_x;
+    start_y_offset = event_props(e).page_y;
+    touch_start_time = new Date().getTime();
+
     // bind the move and end events
     window.addEventListener(events.move, touch_move, false);
     window.addEventListener(events.stop, touch_end, false);
@@ -145,8 +140,6 @@ function Swiper(el, params) {
     moving_parent = false;
     moving_el = el;
     var diff = event_props(e).page_x;
-    
-    console.log("move: "+self.el.id);
     
     // cancel touch if more than 1 fingers
     if (is_touch_device() && e.touches.length > 1) {
@@ -178,15 +171,15 @@ function Swiper(el, params) {
         }
         
         // if we are on the first or last slide
-        if (index == 0 && delta_x > 0 || index == children_num - 1 && delta_x < 0) {
+        if (self.index == 0 && delta_x > 0 || self.index == children_num - 1 && delta_x < 0) {
           
           // if we have a parent - move that!
           if (self.parent_swiper) {
-            console.log("parent!");
             moving_parent = true;
             moving_el = self.parent_swiper.el;
-            self.pos = self.parent_swiper.pos;
+            
             delta_x = -delta_x;
+            
           } else {
             // increase resistance
             delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
@@ -197,12 +190,12 @@ function Swiper(el, params) {
 
         // move the el with css3 transform
         for (var k in dom_prefixes) {
-          moving_el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + self.pos) + 'px, 0px, 0px)';
+          moving_el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + (moving_parent ? self.parent_swiper.pos : self.pos)) + 'px, 0px, 0px)';
         }
         
-        if (self.parent_swiper)
-          self.pos = (-delta_x) + self.pos;
-          
+        // save the current offset (pos) for later use
+        self.current_offset = (-delta_x) + (moving_parent ? self.parent_swiper.pos : self.pos);
+
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
         lock_x = true;
         
@@ -215,58 +208,54 @@ function Swiper(el, params) {
   
   // touch end
   function touch_end(e) {
-    console.log("touch end!");
 
+    var current_swiper = moving_parent ? self.parent_swiper : self;
+    var pos = moving_parent ? self.current_offset : self.pos;
+    
     // set global swiper actice var to false to make room for another swiper
     window.swiper_active = false;
     lock_x = false;
     window.removeEventListener(events.move, touch_move, false);
     window.removeEventListener(events.stop, touch_end, false);
-    
+
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
     var slide_adjust = (new Date().getTime() - touch_start_time) * 50,
-        change_x = o.slide_strength * (Math.abs(self.start_x) - Math.abs(self.pos)),
+        change_x = o.slide_strength * (Math.abs(current_swiper.start_x) - Math.abs(pos)),
         slide_adjust = change_x && slide_adjust ? Math.round(change_x / slide_adjust) : 0,
-        new_left = slide_adjust + self.pos;
+        new_left = slide_adjust + pos;
 
     // abort if we slide to the left and on the first slide
-    // if (((self.start_x - self.pos) < 0 && index == 0) || ((self.start_x - self.pos) > 0 && index == el.children.length-1)) {
-    //   console.log("on the first slide and sliding left... not gonna work...");
-    //   self.goto_index(index);
-    //   return;
-    // }
+    if (!moving_parent && (((current_swiper.start_x - current_swiper.pos) < 0 && current_swiper.index == 0) || ((current_swiper.start_x - current_swiper.pos) > 0 && current_swiper.index == current_swiper.el.children.length-1))) {
+      current_swiper.goto_index(current_swiper.index);
+      return;
+    }
     
     // snap to closest element
     if (o.snap) {
-
       var closest_el = get_closest_element(moving_el, new_left);
-
       // how big is the difF?
-      // var diff = Math.abs(index - get_index_of_el(closest_el));
-      // // never swipe away more than one element. if diff is bigger than 0 we have swiped good enough to send away
-      // if (o.only_slide_one_el && diff > 0) {
-      //   // console.log("only slide one");
-      //   // to the left
-      //   if ((self.start_x - self.pos) < 0) {
-      //     self.goto_index(index-1)
-      //   } else {
-      //     self.goto_index(index+1)
-      //   }
-      //   
-      //   return;
-      // }
+      var diff = Math.abs(current_swiper.index - current_swiper.get_index_of_el(closest_el));
+      // never swipe away more than one element. if diff is bigger than 0 we have swiped good enough to send away
+      if (o.only_slide_one_el && diff > 0) {
+        // to the left
+        if ((current_swiper.start_x - self.pos) < 0) {
+          current_swiper.goto_index(current_swiper.index-1);
+        } else {
+          current_swiper.goto_index(current_swiper.index+1);
+        }
+        return;
+      }
       
       new_left = -closest_el.offsetLeft;
     }
-    
-    console.log("go to new position. "+self.el.id);
-    // Go to the new position!
-    if (moving_parent)
-      self.parent_swiper.goto_pos(new_left);
-    else
-      self.goto_pos(new_left);
 
+    // Go to the new position!
+    current_swiper.goto_pos(new_left);
+    
+    // set start x to the new position for the parent swiper functionality
+    self.start_x = new_left;
+    
   };
   
   // set some styling on the elements
@@ -287,7 +276,6 @@ function Swiper(el, params) {
 
   // Get the closest element to a "viewport"
   function get_closest_element(parent, pos) {
-    // console.log(parent);
     // the vars
     var children = parent.childNodes,
         min = 9999999,
@@ -326,6 +314,7 @@ function Swiper(el, params) {
       }
     }
   }
+  this.get_index_of_el = get_index_of_el;
   
   // Reset the positioning. Go back to the start position
   this.reset = function() {
@@ -342,7 +331,7 @@ function Swiper(el, params) {
   // Go to specific element by list item number
   // @param index {Number} The index of element to go to
   this.goto_index = function(i) {
-    index = i;
+    self.index = i;
     var goto_el = el.children[i];
     self.goto_pos(-goto_el.offsetLeft);
     return goto_el;
@@ -354,7 +343,7 @@ function Swiper(el, params) {
     // update index
     for (var i = 0, len = children_num; i < len; i++) {
       if (-el.children[i].offsetLeft == x) {
-        index = i;
+        self.index = i;
       }
     }
 
@@ -399,11 +388,11 @@ function Swiper(el, params) {
   }
   
   this.get_index = function() {
-    return index;
+    return self.index;
   }
   this.set_index = function(i) {
-    index = i;
-    self.pos = -el.children[index].offsetLeft;
+    self.index = i;
+    self.pos = -el.children[self.index].offsetLeft;
   }
 
   init();
