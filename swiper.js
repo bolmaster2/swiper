@@ -26,8 +26,8 @@ function Swiper(el, params) {
   var viewport = el.parentNode,
       start_y = 0,
       touch_start_time,
-      start_x_offset = 0,
-      start_y_offset = 0,
+      start_page_x_offset = 0,
+      start_page_y_offset = 0,
       direction = null, 
       lock_x = false,
       dom_prefixes = "Webkit Moz O ms Khtml".split(" "),
@@ -115,12 +115,17 @@ function Swiper(el, params) {
     // reset the delta x
     delta_x = 0;
 
-    // get the start values
+    // set the start x to the current position of the current element
     self.start_x = self.pos;
+    // set the start x of the parent to the parent swiper's start_x.
     self.start_x_parent = self.parent_swiper ? self.parent_swiper.start_x : null;
 
-    start_x_offset = event_props(e).page_x;
-    start_y_offset = event_props(e).page_y;
+    // Get the x/y offsets
+    start_page_x_offset = event_props(e).page_x;
+    start_page_y_offset = event_props(e).page_y;
+    console.log("start x offset: "+start_page_x_offset);
+    
+    // save the time
     touch_start_time = new Date().getTime();
 
     // bind the move and end events
@@ -137,17 +142,20 @@ function Swiper(el, params) {
   
   // touch move
   function touch_move(e) {
+    // are we moving a parent?
     moving_parent = false;
+    // the moving el
     moving_el = el;
-    var diff = event_props(e).page_x;
+    // the current page x offset 
+    var current_page_x_offset = event_props(e).page_x;
     
     // cancel touch if more than 1 fingers
     if (is_touch_device() && e.touches.length > 1) {
       cancel_touch();
     } else {
       // the x and y movement
-      var delta_x = event_props(e).page_x - start_x_offset,
-      delta_y = event_props(e).page_y - start_y_offset; 
+      var delta_x = current_page_x_offset - start_page_x_offset,
+      delta_y = event_props(e).page_y - start_page_y_offset; 
       
       // is the swipe more up/down then left/right? if so - cancel the touch events
       if ((Math.abs(delta_y) > 1 && Math.abs(delta_x) < 5) && !lock_x) {   
@@ -155,11 +163,11 @@ function Swiper(el, params) {
         return;
       } else {
 
-        // the swipe is mostly going in the x-direction - let the elements follow the finger
-        self.pos = self.start_x + diff - start_x_offset;
+        // let the element follow the finger
+        self.pos = self.start_x + current_page_x_offset - start_page_x_offset;
         
         // in which direction are we swiping?
-        var dir = (diff - start_x_offset > 0) ? 'left' : 'right';
+        var dir = (current_page_x_offset - start_page_x_offset > 0) ? 'left' : 'right';
         
         // add direction classes
         if (dir == 'left' && !has_class(el, 'left')) {
