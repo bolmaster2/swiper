@@ -18,9 +18,10 @@ function Swiper(el, params) {
   this.parent_swiper = null;
   
   this.pos = 0;
-  this.start_x = 0;
+  this.el_start_x = 0;
   this.index = 0;
   this.current_offset = 0;
+  this.current_page_x_offset = 0;
   
   // private vars
   var viewport = el.parentNode,
@@ -116,14 +117,11 @@ function Swiper(el, params) {
     delta_x = 0;
 
     // set the start x to the current position of the current element
-    self.start_x = self.pos;
-    // set the start x of the parent to the parent swiper's start_x.
-    self.start_x_parent = self.parent_swiper ? self.parent_swiper.start_x : null;
-
+    self.el_start_x = self.pos;
+    
     // Get the x/y offsets
     start_page_x_offset = event_props(e).page_x;
     start_page_y_offset = event_props(e).page_y;
-    console.log("start x offset: "+start_page_x_offset);
     
     // save the time
     touch_start_time = new Date().getTime();
@@ -147,14 +145,14 @@ function Swiper(el, params) {
     // the moving el
     moving_el = el;
     // the current page x offset 
-    var current_page_x_offset = event_props(e).page_x;
+    self.current_page_x_offset = event_props(e).page_x;
     
     // cancel touch if more than 1 fingers
     if (is_touch_device() && e.touches.length > 1) {
       cancel_touch();
     } else {
       // the x and y movement
-      var delta_x = current_page_x_offset - start_page_x_offset,
+      var delta_x = self.current_page_x_offset - start_page_x_offset,
       delta_y = event_props(e).page_y - start_page_y_offset; 
       
       // is the swipe more up/down then left/right? if so - cancel the touch events
@@ -162,36 +160,33 @@ function Swiper(el, params) {
         cancel_touch();
         return;
       } else {
-
-        // let the element follow the finger
-        self.pos = self.start_x + current_page_x_offset - start_page_x_offset;
-
-        
         // if we are on the first or last slide we should move the parent element if we have on OR increase resistance if we dont.
         if (self.index == 0 && delta_x > 0 || self.index == children_num - 1 && delta_x < 0) {
-          
           // if we have a parent - move that!
           if (self.parent_swiper) {
             moving_parent = true;
             moving_el = self.parent_swiper.el;
-            
             delta_x = -delta_x;
             
           } else {
             // otherwise increase the resistance
-            delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
+            // delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
           }
         } else {      
           delta_x = 0;
         }
+        
+        // set the pos if we dont move a parent
+        if (!moving_parent) {
+          self.pos = self.el_start_x + self.current_page_x_offset - start_page_x_offset;
+        }
+        // save the current offset (pos) for later use
+        self.current_offset = (-delta_x) + (moving_parent ? self.parent_swiper.pos : self.pos);
 
         // move the el with css3 transform
         for (var k in dom_prefixes) {
-          moving_el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + ((-delta_x) + (moving_parent ? self.parent_swiper.pos : self.pos)) + 'px, 0px, 0px)';
+          moving_el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + self.current_offset + 'px, 0px, 0px)';
         }
-        
-        // save the current offset (pos) for later use
-        self.current_offset = (-delta_x) + (moving_parent ? self.parent_swiper.pos : self.pos);
 
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
         lock_x = true;
@@ -204,8 +199,7 @@ function Swiper(el, params) {
   };
   
   // touch end
-  function touch_end(e) {
-
+  function touch_end(e) {    
     var current_swiper = moving_parent ? self.parent_swiper : self;
     var pos = moving_parent ? self.current_offset : self.pos;
     
@@ -218,12 +212,12 @@ function Swiper(el, params) {
     // push the element a bit more depending on sliding speed...
     // a bit of math vars
     var slide_adjust = (new Date().getTime() - touch_start_time) * 50,
-        change_x = o.slide_strength * (Math.abs(current_swiper.start_x) - Math.abs(pos)),
+        change_x = o.slide_strength * (Math.abs(current_swiper.el_start_x) - Math.abs(pos)),
         slide_adjust = change_x && slide_adjust ? Math.round(change_x / slide_adjust) : 0,
         new_left = slide_adjust + pos;
 
     // abort if we slide to the left and on the first slide
-    if (!moving_parent && (((current_swiper.start_x - current_swiper.pos) < 0 && current_swiper.index == 0) || ((current_swiper.start_x - current_swiper.pos) > 0 && current_swiper.index == current_swiper.el.children.length-1))) {
+    if (!moving_parent && (((current_swiper.el_start_x - current_swiper.pos) < 0 && current_swiper.index == 0) || ((current_swiper.el_start_x - current_swiper.pos) > 0 && current_swiper.index == current_swiper.el.children.length-1))) {
       current_swiper.goto_index(current_swiper.index);
       return;
     }
@@ -233,10 +227,12 @@ function Swiper(el, params) {
       var closest_el = get_closest_element(moving_el, new_left);
       // how big is the difF?
       var diff = Math.abs(current_swiper.index - current_swiper.get_index_of_el(closest_el));
+
       // never swipe away more than one element. if diff is bigger than 0 we have swiped good enough to send away
       if (o.only_slide_one_el && diff > 0) {
+        var direction = start_page_x_offset - self.current_page_x_offset;
         // to the left
-        if ((current_swiper.start_x - self.pos) < 0) {
+        if (direction < 0) {
           current_swiper.goto_index(current_swiper.index-1);
         } else {
           current_swiper.goto_index(current_swiper.index+1);
@@ -246,13 +242,11 @@ function Swiper(el, params) {
       
       new_left = -closest_el.offsetLeft;
     }
+    
 
     // Go to the new position!
     current_swiper.goto_pos(new_left);
-    
-    // set start x to the new position for the parent swiper functionality
-    self.start_x = new_left;
-    
+
   };
   
   // set some styling on the elements
@@ -328,19 +322,16 @@ function Swiper(el, params) {
   // Go to specific element by list item number
   // @param index {Number} The index of element to go to
   this.goto_index = function(i) {
-    self.index = i;
-    var goto_el = el.children[i];
-    self.goto_pos(-goto_el.offsetLeft);
-    return goto_el;
+    self.goto_pos(-(viewport.clientWidth * i));
   }
   
   // Go to specific position
   // @param x {Integer} The x-value to send the list item to (preferable a negative value)
   this.goto_pos = function(x) {
     // update index
-    for (var i = 0, len = children_num; i < len; i++) {
-      if (-el.children[i].offsetLeft == x) {
-        self.index = i;
+    for (var i = 0; i < children_num; i++) {
+      if (-(viewport.clientWidth * i) == x) {
+        self.set_index(i);
       }
     }
 
@@ -389,7 +380,6 @@ function Swiper(el, params) {
   }
   this.set_index = function(i) {
     self.index = i;
-    self.pos = -el.children[self.index].offsetLeft;
   }
 
   init();
