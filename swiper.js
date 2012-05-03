@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.5
+ * @version 0.6
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
