@@ -2,30 +2,43 @@
 
 <style>
   * {margin: 0; padding: 0;}
+  body {
+    font-size: 150%;
+  }
+  .swipes ul {-webkit-backface-visibility: hidden;}
   
+  .swipes,
+  .swipes ul,
   .swipes ul li {
     min-height: 400px;
+  }
+  
+  .swipes ul li {
     text-align: center;
+  }
+  .swipes ul li img {
+    display: block;
   }
 </style>
 
 <div class="swipes">
   <ul id="my-list">
-    <li style="background-color: #999;">1</li>
-    <li style="background-color: #666;">
+    <li id="main-1" style="background-color: #999;">1</li>
+    <li id="main-2" style="background-color: #666;">
       2
       <div class="swipes">
         <ul id="my-sub-swiper-list">
-          <li><img src="img/1.jpg" alt="" /></li>
-          <li><img src="img/2.jpg" alt="" /></li>
-          <li><img src="img/3.jpg" alt="" /></li>
+          <li id="sub-1"><img src="img/1.jpg" alt="" /></li>
+          <li id="sub-2"><img src="img/2.jpg" alt="" /></li>
+          <li id="sub-3"><img src="img/3.jpg" alt="" /></li>
         </ul>
       </div>
     </li>
-    <li style="background-color: #333;">3</li>
+    <li id="main-3" style="background-color: #333;">3</li>
+    <li id="main-4" style="background-color: #111;">4</li>
   </ul>
 </div>
-<script src="swiper.js"></script>
+<script src="swiper.js?2"></script>
 <script>
   // Init the swiper!
   var swiper = new Swiper(document.getElementById("my-list"), {
