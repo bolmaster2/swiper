@@ -165,20 +165,9 @@ function Swiper(el, params) {
 
         // let the element follow the finger
         self.pos = self.start_x + current_page_x_offset - start_page_x_offset;
+
         
-        // in which direction are we swiping?
-        var dir = (current_page_x_offset - start_page_x_offset > 0) ? 'left' : 'right';
-        
-        // add direction classes
-        if (dir == 'left' && !has_class(el, 'left')) {
-          remove_class(el, 'swiping-right');
-          add_class(el, 'swiping-'+dir);
-        } else if (dir == 'right' && !has_class(el, 'right')) {
-          remove_class(el, 'swiping-left');
-          add_class(el, 'swiping-'+dir);
-        }
-        
-        // if we are on the first or last slide
+        // if we are on the first or last slide we should move the parent element if we have on OR increase resistance if we dont.
         if (self.index == 0 && delta_x > 0 || self.index == children_num - 1 && delta_x < 0) {
           
           // if we have a parent - move that!
@@ -189,7 +178,7 @@ function Swiper(el, params) {
             delta_x = -delta_x;
             
           } else {
-            // increase resistance
+            // otherwise increase the resistance
             delta_x = (delta_x / (Math.abs(delta_x) / viewport.clientWidth + 1)) * 1;
           }
         } else {      
