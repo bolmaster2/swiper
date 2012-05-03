@@ -1,0 +1,40 @@
+<!doctype html>
+
+<style>
+  * {margin: 0; padding: 0;}
+  
+  .swipes ul li {
+    min-height: 400px;
+    text-align: center;
+  }
+</style>
+
+<div class="swipes">
+  <ul id="my-list">
+    <li style="background-color: #999;">1</li>
+    <li style="background-color: #666;">
+      2
+      <div class="swipes">
+        <ul id="my-sub-swiper-list">
+          <li><img src="img/1.jpg" alt="" /></li>
+          <li><img src="img/2.jpg" alt="" /></li>
+          <li><img src="img/3.jpg" alt="" /></li>
+        </ul>
+      </div>
+    </li>
+    <li style="background-color: #333;">3</li>
+  </ul>
+</div>
+<script src="swiper.js"></script>
+<script>
+  // Init the swiper!
+  var swiper = new Swiper(document.getElementById("my-list"), {
+    support_mouse: true // enable mouse swiping in the browser (experimental)
+  });
+  
+  // init sub swiper
+  var sub_swiper = new Swiper(document.getElementById("my-sub-swiper-list"), {
+    support_mouse: true
+  });
+  
+</script>
