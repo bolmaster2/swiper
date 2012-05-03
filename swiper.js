@@ -240,7 +240,7 @@ function Swiper(el, params) {
         return;
       }
       
-      new_left = -closest_el.offsetLeft;
+      new_left = closest_el ? -closest_el.offsetLeft : 0;
     }
     
 
@@ -267,25 +267,27 @@ function Swiper(el, params) {
 
   // Get the closest element to a "viewport"
   function get_closest_element(parent, pos) {
-    // the vars
-    var children = parent.childNodes,
-        min = 9999999,
-        current_pos = -parseInt(pos),
-        el = null;
-    
-    // loop through our childrens to find the closest one to our parent (aka "viewport")
-    for (var i = 0; i < children.length; i++) {
-      // get our "value"; that is the current children's offset minus our current position
-      var value = children[i].offsetLeft - current_pos;
+    if (parent) {
+      // the vars
+      var children = parent.childNodes,
+          min = 9999999,
+          current_pos = -parseInt(pos),
+          el = null;
       
-      // flip the value from negative to positive to get the same results from elements from both left and right side 
-      if (value < 0)
-        value = -value;
-      
-      // lets find the lowest value (aka closest element)
-      if (value < min) {
-        min = value;
-        el = children[i];
+      // loop through our childrens to find the closest one to our parent (aka "viewport")
+      for (var i = 0; i < children.length; i++) {
+        // get our "value"; that is the current children's offset minus our current position
+        var value = children[i].offsetLeft - current_pos;
+        
+        // flip the value from negative to positive to get the same results from elements from both left and right side 
+        if (value < 0)
+          value = -value;
+        
+        // lets find the lowest value (aka closest element)
+        if (value < min) {
+          min = value;
+          el = children[i];
+        }
       }
     }
     // return the element
