@@ -346,10 +346,6 @@ function Swiper(el, params) {
      // Run callback after the transition speed
       setTimeout(function() {
         
-        // remove any swiping direction classes
-        remove_class(el, 'swiping-left');
-        remove_class(el, 'swiping-right');
-        
         // after swipe callback
         if (o.after_swipe_callback)
           o.after_swipe_callback.call(self);
