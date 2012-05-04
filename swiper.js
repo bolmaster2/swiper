@@ -202,7 +202,6 @@ function Swiper(el, params) {
   function touch_end(e) {    
     var current_swiper = moving_parent ? self.parent_swiper : self;
     var pos = moving_parent ? self.current_offset : self.pos;
-    
     // set global swiper actice var to false to make room for another swiper
     window.swiper_active = false;
     lock_x = false;
@@ -239,8 +238,7 @@ function Swiper(el, params) {
         }
         return;
       }
-      
-      new_left = closest_el ? -closest_el.offsetLeft : 0;
+      new_left = closest_el ? -(get_index_of_el(closest_el) * viewport.clientWidth) : 0;
     }
     
 
@@ -269,16 +267,15 @@ function Swiper(el, params) {
   function get_closest_element(parent, pos) {
     if (parent) {
       // the vars
-      var children = parent.childNodes,
+      var children = parent.children,
           min = 9999999,
-          current_pos = -parseInt(pos),
+          current_pos = Math.abs(pos),
           el = null;
       
       // loop through our childrens to find the closest one to our parent (aka "viewport")
       for (var i = 0; i < children.length; i++) {
         // get our "value"; that is the current children's offset minus our current position
-        var value = children[i].offsetLeft - current_pos;
-        
+        var value = (i * viewport.clientWidth) - current_pos;
         // flip the value from negative to positive to get the same results from elements from both left and right side 
         if (value < 0)
           value = -value;

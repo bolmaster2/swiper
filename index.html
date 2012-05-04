@@ -14,7 +14,10 @@
       
     }
     /* fix flickering bug in ios - http://stackoverflow.com/questions/2946748/iphone-webkit-css-animations-cause-flicker */
-    .swipes ul {-webkit-backface-visibility: hidden;}
+    .swipes ul li {
+      -webkit-perspective: 1000;
+      -webkit-backface-visibility: hidden;
+      }
     
     /* center the images inside the list item */
     .swipes ul > li {
