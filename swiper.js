@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.6
+ * @version 0.6.0.1
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
@@ -405,24 +405,6 @@ function sibling(el, dir) {
     el = el[dir+"Sibling"];
   } while (el && el.nodeType != 1);
   return el;  
-}
-
-// has class
-function has_class(ele,cls) {
-  return ele.className.match(new RegExp('(\\s|^)'+cls+'(\\s|$)'));
-}
-
-// add class
-function add_class(ele,cls) {
-  if (!has_class(ele,cls)) ele.className += " "+cls.replace(/^\s|\s$/,'');
-}
-
-// remove class
-function remove_class(ele,cls) {
-  if (has_class(ele,cls)) {
-    var reg = new RegExp('(\\s|^)'+cls+'(\\s|$)');
-    ele.className=ele.className.replace(reg,' ').replace(/^\s|\s$/,'');
-  }
 }
 
 // test if child is child of parent
