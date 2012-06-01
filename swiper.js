@@ -22,6 +22,7 @@ function Swiper(el, params) {
   this.index = 0;
   this.current_offset = 0;
   this.current_page_x_offset = 0;
+  this.is_touch = is_touch_device();
   
   // private vars
   var viewport = el.parentNode,
@@ -44,9 +45,9 @@ function Swiper(el, params) {
     }
   }
   var events = {
-    'start': is_touch_device() ? "touchstart" : "mousedown",
-    'move': is_touch_device() ? "touchmove" : "mousemove",
-    'stop': is_touch_device() ? "touchend" : "mouseup"
+    'start': this.is_touch ? "touchstart" : "mousedown",
+    'move': this.is_touch ? "touchmove" : "mousemove",
+    'stop': this.is_touch ? "touchend" : "mouseup"
   }
   
   // default options
@@ -68,7 +69,7 @@ function Swiper(el, params) {
   function init() {
     
     // Stop here if we don't want to support mouse swiping on non touch devices (or when addeventlistener isn't supported)
-    if ((!is_touch_device() && !o.support_mouse) || !window.addEventListener) {
+    if ((!self.is_touch && !o.support_mouse) || !window.addEventListener) {
       return false;
     }
     
@@ -90,7 +91,11 @@ function Swiper(el, params) {
       set_sizes();
       
       // ... and when the window is resized
-      window.addEventListener("resize", set_sizes);
+      if (self.is_touch) {
+        window.addEventListener("orientationchange", set_sizes);
+      } else {
+        window.addEventListener("resize", set_sizes);
+      }
     }
 
     // bind touch start event
@@ -99,7 +104,7 @@ function Swiper(el, params) {
   
   // touch start
   function touch_start(e) {
-    if (!is_touch_device())
+    if (!self.is_touch)
       e.preventDefault();
     
     // reset the transition duration
@@ -149,7 +154,7 @@ function Swiper(el, params) {
     self.current_page_x_offset = event_props(e).page_x;
     
     // cancel touch if more than 1 fingers
-    if (is_touch_device() && e.touches.length > 1) {
+    if (self.is_touch && e.touches.length > 1) {
       cancel_touch();
     } else {
       // the x and y movement
@@ -250,7 +255,7 @@ function Swiper(el, params) {
   
   // set the sizes (width) on the elements
   function set_sizes() {
-    
+
     // get the width from the viewports parent
     var w = viewport.parentNode.clientWidth,
         unit = "px";
