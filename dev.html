@@ -1,13 +1,19 @@
 <!doctype html>
 
+
+
 <style>
   * {margin: 0; padding: 0;}
   body {
     font-size: 150%;
   }
   .swipes ul li {
-    -webkit-perspective: 1000;
+/*    -webkit-perspective: 1000;*/
     -webkit-backface-visibility: hidden;
+  }
+  
+  .swipes {
+    overflow: hidden;
   }
   
   .swipes,
@@ -18,6 +24,7 @@
   
   .swipes ul li {
     text-align: center;
+    float: left;
   }
   .swipes ul li img {
     display: block;
@@ -26,9 +33,12 @@
 
 <div class="swipes">
   <ul id="my-list">
-    <li id="main-1" style="background-color: #999;"><img src="http://placekitten.com/g/1000/1000" alt="" /></li>
+    <li id="main-1" style="background-color: #999;">
+      1
+      <img src="http://placekitten.com/g/1000/1000" alt="" />
+    </li>
     <li id="main-2" style="background-color: #666;">
-      
+      2
       <div class="swipes">
         <ul id="my-sub-swiper-list">
           <li id="sub-1"><img src="http://placekitten.com/1000/1000" alt="" /></li>
@@ -37,7 +47,10 @@
         </ul>
       </div>
     </li>
-    <li id="main-3" style="background-color: #333;"><img src="http://placekitten.com/g/1000/1000" alt="" /></li>
+    <li id="main-3" style="background-color: #333;">
+      3
+      <img src="http://placekitten.com/g/1000/1000" alt="" />
+    </li>
     <li id="main-4" style="background-color: gold;">
       4
       <div class="swipes">
@@ -48,7 +61,7 @@
         </ul>
       </div>
     </li>
-    <li style="background-color: gold;">4.5</li>
+    <li style="background-color: green;">4.5</li>
     <li id="main-5" style="background-color: #999;">
       5
       <div class="swipes">
@@ -59,7 +72,8 @@
         </ul>
       </div>
     </li>
-    <li style="background-color: gold;">5.5
+    <li style="background-color: gold;">
+      5.5
       <li><img src="http://placekitten.com/1000/700" alt="" /></li>
       </li>
     <li id="main-6" style="background-color: #999;">6<div class="swipes">
@@ -136,47 +150,6 @@
       <div class="swipes">
         <ul>
           <li><img src="http://placekitten.com/1000/1000" alt="" /></li>
-          <li><img src="http://placekitten.com/600/500" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
-          <li><img src="http://placekitten.com/700/300" alt="" /></li>
 
         </ul>
       </div>
@@ -193,8 +166,8 @@
   
   var els = document.querySelectorAll(".swipes > ul");
   for (var i = 0; i < els.length; i++) {
-    console.log(i);
-    console.log(els[i]);
+    // console.log(i);
+    // console.log(els[i]);
     new Swiper(els[i], {
       support_mouse: true // enable mouse swiping in the browser (experimental)
     });
