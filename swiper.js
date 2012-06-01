@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.6.0.1
+ * @version 0.6.0.2
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
@@ -57,7 +57,6 @@ function Swiper(el, params) {
     "animation_type": "linear", // type of swipe animation
     "support_mouse": false, // support mouse swiping - experimental
     "after_swipe_callback": null, // callback after a swipe is finished
-    // "orientation_change_callback": null, 
     "set_sizes": true, // should swiper set width on the elements?
     "only_slide_one_el": true // should we be able to "swipe away" the element more than one element? No!
   };
@@ -89,9 +88,8 @@ function Swiper(el, params) {
     if (o.set_sizes) {
       // set styles now
       set_sizes();
-      // ... and when the orientation change
-      // window.addEventListener("orientationchange", set_sizes);
-      // and when the window is resized
+      
+      // ... and when the window is resized
       window.addEventListener("resize", set_sizes);
     }
 
