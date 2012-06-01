@@ -56,8 +56,9 @@ function Swiper(el, params) {
     "transition_speed": 250, // the transition speed when swiped
     "animation_type": "linear", // type of swipe animation
     "support_mouse": false, // support mouse swiping - experimental
-    "after_swipe_callback": null,
-    "set_styles": true, // should swiper set css styles on the elements?
+    "after_swipe_callback": null, // callback after a swipe is finished
+    // "orientation_change_callback": null, 
+    "set_sizes": true, // should swiper set width on the elements?
     "only_slide_one_el": true // should we be able to "swipe away" the element more than one element? No!
   };
   // override the default options with the params
@@ -85,11 +86,13 @@ function Swiper(el, params) {
     }
     
     // set styles on the elements
-    if (o.set_styles) {
-      set_styles();
-      window.addEventListener("orientationchange", set_styles);
-      // bind resize events
-      window.addEventListener("resize", set_styles);
+    if (o.set_sizes) {
+      // set styles now
+      set_sizes();
+      // ... and when the orientation change
+      // window.addEventListener("orientationchange", set_sizes);
+      // and when the window is resized
+      window.addEventListener("resize", set_sizes);
     }
 
     // bind touch start event
@@ -247,18 +250,27 @@ function Swiper(el, params) {
 
   };
   
-  // set some styling on the elements
-  function set_styles() {
+  // set the sizes (width) on the elements
+  function set_sizes() {
+    
     // get the width from the viewports parent
-    var w = viewport.parentNode.clientWidth;
+    var w = viewport.parentNode.clientWidth,
+        unit = "px";
+
+    if (parseInt(w) == 0) {
+      w = parseInt(viewport.parentNode.style.width);
+    }
+
     
-    // style the viewport
-    style_me(viewport, {"minWidth": "0", "width": w+"px", "overflow": "hidden", "display": "block"});
+    // the viewport get the width
+    viewport.style.width = w+unit;
     
-    style_me(el, {"width": "999920px", "display": "block"});
-    var els = el.getElementsByTagName("li");
-    for (var i = 0; i < els.length; i++) {
-      style_me(els[i], {"width": w+"px", "float": "left", "display": "block"});
+    // set a width that's big enough for the children inside
+    el.style.width = (el.children.length * w) + unit;
+    
+    // set a width on all the children
+    for (var i = 0, els = el.children, len = els.length; i < len; i++) {
+      els[i].style.width = w+unit;
     }
 
   }
@@ -273,7 +285,7 @@ function Swiper(el, params) {
           el = null;
       
       // loop through our childrens to find the closest one to our parent (aka "viewport")
-      for (var i = 0; i < children.length; i++) {
+      for (var i = 0, len = children.length; i < len; i++) {
         // get our "value"; that is the current children's offset minus our current position
         var value = (i * viewport.clientWidth) - current_pos;
         // flip the value from negative to positive to get the same results from elements from both left and right side 
@@ -381,18 +393,6 @@ function Swiper(el, params) {
 }
 
 // external helpers
-// set style rules
-function style_me(el, styles) {
-  // loop the style rules and set them
-  for (var k in styles) {
-    if (el.style) {
-      if (k == "float") {el.style.cssFloat = styles[k];}
-      el.style[k] = styles[k];
-    }
-      
-  }
-  return;
-}
 
 // Check to see if we can create touch events to see if it's a "touch device"
 function is_touch_device() {
