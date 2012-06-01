@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.6.0.2
+ * @version 0.6.0.3
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
@@ -370,16 +370,14 @@ function Swiper(el, params) {
   };
   // Go to next item in list
   this.goto_next = function() {
-    var current_el = get_current_el_in_view();   
-    var next_el = sibling(current_el);
+    var next_el = self.el.children[self.index+1];
     if (!next_el) 
       return false;
     self.goto_el(next_el);
   }
   // Go to previous item in list
   this.goto_prev = function() {
-    var current_el = get_current_el_in_view();
-    var prev_el = sibling(current_el, "previous");
+    var prev_el = self.el.children[self.index-1];
     if (!prev_el) 
       return false;
     self.goto_el(prev_el);
@@ -400,14 +398,6 @@ function Swiper(el, params) {
 // Check to see if we can create touch events to see if it's a "touch device"
 function is_touch_device() {
   return !!('ontouchstart' in window);
-}
-// Get next or previous sibling - ignores the textcontent elements
-function sibling(el, dir) {
-  dir = dir || "next";
-  do {
-    el = el[dir+"Sibling"];
-  } while (el && el.nodeType != 1);
-  return el;  
 }
 
 // test if child is child of parent
