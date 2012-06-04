@@ -11,7 +11,7 @@
     * {}
     .swipes {
       width: 100%;
-      
+      overflow: hidden;
     }
     /* fix flickering bug in ios - http://stackoverflow.com/questions/2946748/iphone-webkit-css-animations-cause-flicker */
     .swipes ul li {
@@ -22,6 +22,7 @@
     /* center the images inside the list item */
     .swipes ul > li {
       text-align: center;
+      float: left;
       
     }
     .swipes ul > li img {
