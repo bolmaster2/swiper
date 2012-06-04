@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.6.0.3
+ * @version 0.6.0.4
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
@@ -197,7 +197,7 @@ function Swiper(el, params) {
         // set lock x to true and also prevent defaults to prevent scrolling in the y-direction
         lock_x = true;
         
-        // e.preventDefault();        
+        e.preventDefault();        
         return;
       }
     }
