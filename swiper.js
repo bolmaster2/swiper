@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.6.0.5
+ * @version 0.6.0.6
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
@@ -323,7 +323,8 @@ function Swiper(el, params) {
   
   // Reset the positioning. Go back to the start position
   this.reset = function() {
-    self.goto_index(0);
+    // go to slide without animation
+    self.goto_index(0, false);
   };
   
   // Go to specific element
@@ -335,13 +336,15 @@ function Swiper(el, params) {
   
   // Go to specific element by list item number
   // @param index {Number} The index of element to go to
-  this.goto_index = function(i) {
-    self.goto_pos(-(viewport.clientWidth * i));
+  this.goto_index = function(i, animate) {
+    self.goto_pos(-(viewport.clientWidth * i), animate);
   }
   
   // Go to specific position
   // @param x {Integer} The x-value to send the list item to (preferable a negative value)
-  this.goto_pos = function(x) {
+  this.goto_pos = function(x, animate) {
+    // animate optio, default to true
+    animate = typeof animate == "undefined" ? true : animate;
     // update index
     for (var i = 0; i < children_num; i++) {
       if (-(viewport.clientWidth * i) == x) {
@@ -351,8 +354,17 @@ function Swiper(el, params) {
 
     // do the transition!
     for (var k in dom_prefixes) {
-      el.style[dom_prefixes[k] + "Transition"] = 'all '+o.transition_speed+'ms ' + o.animation_type;
-      el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + x + 'px, 0px, 0px)';
+      // animate it with transition or not?
+      if (animate)
+        el.style[dom_prefixes[k] + "Transition"] = 'all '+o.transition_speed+'ms ' + o.animation_type;
+      else
+        el.style[dom_prefixes[k] + "Transition"] = 'none';
+      
+      // set the transform - remove the transform if it's 0 (performance)
+      if (x == 0)
+        el.style[dom_prefixes[k] + "Transform"] = 'none';
+      else
+        el.style[dom_prefixes[k] + "Transform"] = 'translate3d(' + x + 'px, 0px, 0px)';
     }
     // save the new position
     self.pos = x;
