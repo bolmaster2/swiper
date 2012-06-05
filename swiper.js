@@ -3,7 +3,7 @@
  * Slider for touch devices - makes a list swipeable
  * @author Joel Larsson @joellarsson
  * @url https://github.com/blmstr/swiper
- * @version 0.6.0.6
+ * @version 0.6.0.7
  * Licensed under the MIT license
  *
  * @param el {HTMLUListElement} The list element
@@ -230,8 +230,10 @@ function Swiper(el, params) {
     // snap to closest element
     if (o.snap) {
       var closest_el = get_closest_element(moving_el, new_left);
+      var closest_el_index = current_swiper.get_index_of_el(closest_el);
+
       // how big is the difF?
-      var diff = Math.abs(current_swiper.index - current_swiper.get_index_of_el(closest_el));
+      var diff = Math.abs(current_swiper.index - closest_el_index);
 
       // never swipe away more than one element. if diff is bigger than 0 we have swiped good enough to send away
       if (o.only_slide_one_el && diff > 0) {
@@ -244,10 +246,9 @@ function Swiper(el, params) {
         }
         return;
       }
-      new_left = closest_el ? -(get_index_of_el(closest_el) * viewport.clientWidth) : 0;
+      new_left = closest_el ? -(closest_el_index * viewport.clientWidth) : 0;
     }
     
-
     // Go to the new position!
     current_swiper.goto_pos(new_left);
 
