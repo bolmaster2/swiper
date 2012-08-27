@@ -160,9 +160,18 @@ function Swiper(el, params) {
       // the x and y movement
       var delta_x = self.current_page_x_offset - start_page_x_offset,
       delta_y = event_props(e).page_y - start_page_y_offset; 
-      
+
+      var angle = Math.abs(Math.atan2(delta_y, delta_x) * 180 / Math.PI);
+      // console.log(angle);
+
+      show_status(angle);
+      if (angle > 45 && angle < 135) {
+        console.log("up/down");
+        cancel_touch();
+        return;
+      }
       // is the swipe more up/down then left/right? if so - cancel the touch events
-      if ((Math.abs(delta_y) > 1 && Math.abs(delta_x) < 5) && !lock_x) {   
+      if ((Math.abs(delta_y) > 2 && Math.abs(delta_x) < 20) && !lock_x) {   
         cancel_touch();
         return;
       } else {
@@ -428,4 +437,15 @@ function find_parent(child, parent) {
       return false;
   }
   return child_parent;
+}
+
+function show_status(msg) {
+
+  var el = $("#status");
+
+  if (el.length == 0)
+    el = $('<div id="status"></div>').appendTo("body");
+
+  el.html(msg);
+  el.css({position: "absolute", top: 0, left: 0, "z-index": 50, background: "#fff"})
 }
